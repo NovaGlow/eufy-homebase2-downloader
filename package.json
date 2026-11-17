@@ -12,8 +12,18 @@
     "node": ">=24.5.0"
   },
   "dependencies": {
-    "@mega-yfue/eufy-sdk": "0.6.0-beta.62"
+    "@mega-yfue/eufy-sdk": "0.6.0-beta.62",
+    "node-rsa": "1.1.1"
   },
-  "keywords": ["eufy", "homebase", "homebase2", "t8010", "eufycam", "download", "backup", "video"],
+  "keywords": [
+    "eufy",
+    "homebase",
+    "homebase2",
+    "t8010",
+    "eufycam",
+    "download",
+    "backup",
+    "video"
+  ],
   "license": "MIT"
 }

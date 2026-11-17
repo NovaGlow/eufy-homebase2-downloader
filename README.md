@@ -77,6 +77,7 @@ The first time, eufy emails you a verification code — type it when asked. The 
 | `DAYS_BACK` | `3` | How many days of recordings to fetch |
 | `OUT_DIR` | `./eufy_videos` | Where to save clips |
 | `DEBUG` | off | Set to `1` to write a detailed log to `eufy_debug.log` |
+| `EXTRA_BASES` | — | Experimental: other base models to try, e.g. `T8020` (see below) |
 
 Example — everything from the last 30 days: `DAYS_BACK=30 npm start` (PowerShell: `$env:DAYS_BACK="30"; npm start`)
 
@@ -100,6 +101,7 @@ Camera: Front Yard - 562 clip(s) in the last 3 days
 - **Keep `eufy_v6_session.json` private.** It's a live login to your eufy account. It's in `.gitignore`;
   delete it when you're done if you like.
 - **24/7 continuous recordings** are not covered — only event clips.
+- **Video doorbells on their own base (T8020) are not supported yet** — see below.
 
 ## Troubleshooting
 
@@ -127,9 +129,29 @@ Two HomeBase 2 quirks this handles:
 - Each clip's `cipher_id` carries a flag in its high bits (e.g. `134217815` = `0x08000000` + `87`). eufy's
   cloud only knows the low part (`87`), so the flag is stripped before asking for the key.
 
+## Doorbell base (T8020) — not supported yet
+
+A eufy video doorbell paired with its own T8020 base (not the HomeBase 2) gets as far as listing and
+transferring clips, but they can't be decoded. Findings, in case you can take it further
+(`EXTRA_BASES=T8020 npm start` runs the experimental path):
+
+- Recordings live at `/media/mmcblk0p1/Camera00/h264_<yyyyMMddHHmmss>.dat` and list through the same
+  `history_record_info` query as the HomeBase 2.
+- Every clip has `cipher_id: 1`. Neither the v3 nor the legacy v2 `get_ciphers` endpoint returns cipher 1
+  (they only return the account's HomeBase 2 key).
+- It uses eufy's older scheme: only keyframes are sealed, laid out as
+  `[22-byte header][128-byte RSA-wrapped AES key][1 byte][first 128 bytes AES-ECB][rest in clear]`;
+  other frames and AAC audio are in the clear. The account's RSA key does not unwrap it.
+- Asking the base to re-wrap the clip with a client-supplied RSA key (`CMD_SET_PAYLOAD` → `CMD_DOWNLOAD_VIDEO`
+  with `key`) is refused with `-103` (invalid command).
+
+The experimental code decodes this scheme with any RSA key eufy returns, so if someone finds where
+cipher 1 comes from, it should only need that key. PRs welcome.
+
 ## Tested with
 
-- HomeBase 2 (T8010) with T8113 cameras, Windows 11, Node 26
+- HomeBase 2 (T8010) with T8113 cameras, Windows 11, Node 26 — working
+- T8020 doorbell base with a T8222 doorbell — lists and transfers, but can't decrypt (see above)
 
 Other cameras on a HomeBase 2 will probably work. HomeBase 3 and standalone cameras are not supported by
 this tool (the underlying SDK supports some of them).
