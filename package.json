@@ -1,0 +1,19 @@
+{
+  "name": "eufy-homebase2-downloader",
+  "version": "0.1.0",
+  "description": "Bulk-download recorded clips from a eufy HomeBase 2 (T8010) to MP4, instead of one at a time in the app.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node download.mjs",
+    "keycheck": "node keycheck.mjs"
+  },
+  "engines": {
+    "node": ">=24.5.0"
+  },
+  "dependencies": {
+    "@mega-yfue/eufy-sdk": "0.6.0-beta.62"
+  },
+  "keywords": ["eufy", "homebase", "homebase2", "t8010", "eufycam", "download", "backup", "video"],
+  "license": "MIT"
+}

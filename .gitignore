@@ -1,0 +1,15 @@
+node_modules/
+
+# Downloaded videos
+eufy_videos/
+
+# Login session and local debug output - never commit these
+eufy_v6_session.json
+eufy_session/
+eufy_debug.log
+eufy_captcha.png
+eufy_keycheck.txt
+eufy_diagnose.txt
+
+*.part
+.env
